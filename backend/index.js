@@ -2,13 +2,17 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { probarConexion } from "./db.js";
-import authRouter from "./auth.js";
+import passport from "passport";
+import authRouter, { authConfig } from "./auth.js";
 
 const app = express();
 const port = process.env.PORT ?? 3000;
 
 app.use(express.json());
 app.use(cors({ origin: process.env.FRONTEND_URL ?? "http://localhost:5173" }));
+
+authConfig();
+app.use(passport.initialize());
 
 app.get("/", (req, res) => {
   res.json({ success: true, mensaje: "API de gestión de vehículos, conductores y viajes" });

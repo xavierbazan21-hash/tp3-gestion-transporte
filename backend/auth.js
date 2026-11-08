@@ -1,11 +1,54 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import passport from "passport";
+import { Strategy, ExtractJwt } from "passport-jwt";
 import { body } from "express-validator";
 import { db } from "./db.js";
 import { verificarValidaciones, responderErrorDB } from "./validaciones.js";
 
 const router = express.Router();
+
+// Estrategia de Passport que verifica el JWT enviado como "Authorization: Bearer <token>"
+export function authConfig() {
+  passport.use(
+    new Strategy(
+      {
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: process.env.JWT_SECRET,
+      },
+      async (payload, next) => {
+        try {
+          // Se comprueba que el usuario del token siga existiendo
+          const [usuarios] = await db.execute(
+            "SELECT id, nombre, email FROM usuarios WHERE id = ?",
+            [payload.userId]
+          );
+          if (usuarios.length === 0) return next(null, false);
+          next(null, usuarios[0]);
+        } catch (error) {
+          next(error);
+        }
+      }
+    )
+  );
+}
+
+// Middleware para rutas protegidas: responde 401 en JSON si el token falta, es inválido o expiró
+export const verificarAutenticacion = (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (error, usuario, info) => {
+    if (error) return next(error);
+    if (!usuario) {
+      const expirado = info?.name === "TokenExpiredError";
+      return res.status(401).json({
+        success: false,
+        error: expirado ? "La sesión expiró, inicie sesión nuevamente" : "No autorizado",
+      });
+    }
+    req.user = usuario;
+    next();
+  })(req, res, next);
+};
 
 const SALT_ROUNDS = 10;
 const EXPIRACION_TOKEN = "4h";
@@ -102,5 +145,10 @@ router.post(
     }
   }
 );
+
+// GET /auth/perfil: datos del usuario autenticado
+router.get("/perfil", verificarAutenticacion, (req, res) => {
+  res.json({ success: true, data: req.user });
+});
 
 export default router;
