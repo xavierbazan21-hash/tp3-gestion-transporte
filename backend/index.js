@@ -7,6 +7,7 @@ import authRouter, { authConfig } from "./auth.js";
 import usuariosRouter from "./usuarios.js";
 import vehiculosRouter from "./vehiculos.js";
 import conductoresRouter from "./conductores.js";
+import viajesRouter from "./viajes.js";
 
 const app = express();
 const port = process.env.PORT ?? 3000;
@@ -25,6 +26,7 @@ app.use("/auth", authRouter);
 app.use("/usuarios", usuariosRouter);
 app.use("/vehiculos", vehiculosRouter);
 app.use("/conductores", conductoresRouter);
+app.use("/viajes", viajesRouter);
 
 // Ruta inexistente
 app.use((req, res) => {
