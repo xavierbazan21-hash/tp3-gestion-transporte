@@ -1,0 +1,119 @@
+@baseUrl = http://localhost:3000
+
+### Iniciar sesión (obtiene el token para el resto de las peticiones)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "xavier@example.com",
+  "password": "Secreta123"
+}
+
+###
+@token = {{login.response.body.token}}
+
+### Listar todos los viajes con total de km -> 200
+GET {{baseUrl}}/viajes
+Authorization: Bearer {{token}}
+
+### Viajes de un vehículo -> 200
+GET {{baseUrl}}/viajes?vehiculo_id=1
+Authorization: Bearer {{token}}
+
+### Viajes de un conductor -> 200
+GET {{baseUrl}}/viajes?conductor_id=1
+Authorization: Bearer {{token}}
+
+### Filtro inválido -> 400
+GET {{baseUrl}}/viajes?vehiculo_id=abc
+Authorization: Bearer {{token}}
+
+### Registrar viaje -> 201
+POST {{baseUrl}}/viajes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "vehiculo_id": 1,
+  "conductor_id": 1,
+  "fecha_salida": "2026-11-02T06:30",
+  "fecha_llegada": "2026-11-02T15:45",
+  "origen": "La Rioja",
+  "destino": "Córdoba",
+  "kilometros": 460.5,
+  "observaciones": "Carga de materiales de construcción"
+}
+
+### Registrar viaje sin observaciones -> 201
+POST {{baseUrl}}/viajes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "vehiculo_id": 1,
+  "conductor_id": 1,
+  "fecha_salida": "2026-11-04T07:00",
+  "fecha_llegada": "2026-11-04T12:10",
+  "origen": "Córdoba",
+  "destino": "San Juan",
+  "kilometros": 585
+}
+
+### Registrar viaje con llegada anterior a la salida -> 400
+POST {{baseUrl}}/viajes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "vehiculo_id": 1,
+  "conductor_id": 1,
+  "fecha_salida": "2026-11-05T10:00",
+  "fecha_llegada": "2026-11-05T08:00",
+  "origen": "La Rioja",
+  "destino": "Chilecito",
+  "kilometros": 0
+}
+
+### Registrar viaje con vehículo inexistente -> 400
+POST {{baseUrl}}/viajes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "vehiculo_id": 9999,
+  "conductor_id": 1,
+  "fecha_salida": "2026-11-05T10:00",
+  "fecha_llegada": "2026-11-05T13:00",
+  "origen": "La Rioja",
+  "destino": "Chilecito",
+  "kilometros": 190
+}
+
+### Obtener viaje por id -> 200
+GET {{baseUrl}}/viajes/1
+Authorization: Bearer {{token}}
+
+### Obtener viaje inexistente -> 404
+GET {{baseUrl}}/viajes/9999
+Authorization: Bearer {{token}}
+
+### Actualizar viaje -> 200
+PUT {{baseUrl}}/viajes/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "vehiculo_id": 1,
+  "conductor_id": 1,
+  "fecha_salida": "2026-11-02T06:30",
+  "fecha_llegada": "2026-11-02T16:00",
+  "origen": "La Rioja",
+  "destino": "Córdoba",
+  "kilometros": 462,
+  "observaciones": "Demora en control de ruta"
+}
+
+### Eliminar viaje -> 200
+DELETE {{baseUrl}}/viajes/2
+Authorization: Bearer {{token}}

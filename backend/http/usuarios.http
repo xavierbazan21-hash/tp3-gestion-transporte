@@ -1,0 +1,52 @@
+@baseUrl = http://localhost:3000
+
+### Iniciar sesión (obtiene el token para el resto de las peticiones)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "xavier@example.com",
+  "password": "Secreta123"
+}
+
+###
+@token = {{login.response.body.token}}
+
+### Listar usuarios -> 200
+GET {{baseUrl}}/usuarios
+Authorization: Bearer {{token}}
+
+### Obtener usuario por id -> 200
+GET {{baseUrl}}/usuarios/1
+Authorization: Bearer {{token}}
+
+### Obtener usuario inexistente -> 404
+GET {{baseUrl}}/usuarios/9999
+Authorization: Bearer {{token}}
+
+### Id inválido -> 400
+GET {{baseUrl}}/usuarios/abc
+Authorization: Bearer {{token}}
+
+### Actualizar el propio usuario -> 200
+PUT {{baseUrl}}/usuarios/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Xavier E. Bazan"
+}
+
+### Actualizar otro usuario -> 403
+PUT {{baseUrl}}/usuarios/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Intento de cambio"
+}
+
+### Eliminar otro usuario -> 403
+DELETE {{baseUrl}}/usuarios/2
+Authorization: Bearer {{token}}

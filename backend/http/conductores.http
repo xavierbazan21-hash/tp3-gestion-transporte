@@ -1,0 +1,108 @@
+@baseUrl = http://localhost:3000
+
+### Iniciar sesión (obtiene el token para el resto de las peticiones)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "xavier@example.com",
+  "password": "Secreta123"
+}
+
+###
+@token = {{login.response.body.token}}
+
+### Listar conductores -> 200
+GET {{baseUrl}}/conductores
+Authorization: Bearer {{token}}
+
+### Buscar conductores por apellido -> 200
+GET {{baseUrl}}/conductores?buscar=Gomez
+Authorization: Bearer {{token}}
+
+### Crear conductor -> 201
+POST {{baseUrl}}/conductores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Juan",
+  "apellido": "Gómez",
+  "dni": "30123456",
+  "numero_licencia": "LR30123456",
+  "fecha_alta_licencia": "2021-03-15",
+  "fecha_vencimiento_licencia": "2027-03-15"
+}
+
+### Crear conductor con datos inválidos -> 400
+POST {{baseUrl}}/conductores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Juan123",
+  "apellido": "",
+  "dni": "30.123.456",
+  "numero_licencia": "L-1",
+  "fecha_alta_licencia": "15/03/2021",
+  "fecha_vencimiento_licencia": "2020-01-01"
+}
+
+### Crear conductor con vencimiento anterior al alta -> 400
+POST {{baseUrl}}/conductores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellido": "Pérez",
+  "dni": "35987654",
+  "numero_licencia": "LR35987654",
+  "fecha_alta_licencia": "2023-05-10",
+  "fecha_vencimiento_licencia": "2022-05-10"
+}
+
+### Crear conductor con DNI repetido -> 400
+POST {{baseUrl}}/conductores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Pedro",
+  "apellido": "Ruiz",
+  "dni": "30123456",
+  "numero_licencia": "LR99999999",
+  "fecha_alta_licencia": "2022-01-10",
+  "fecha_vencimiento_licencia": "2028-01-10"
+}
+
+### Obtener conductor por id -> 200
+GET {{baseUrl}}/conductores/1
+Authorization: Bearer {{token}}
+
+### Obtener conductor inexistente -> 404
+GET {{baseUrl}}/conductores/9999
+Authorization: Bearer {{token}}
+
+### Historial de viajes y total de km del conductor -> 200
+GET {{baseUrl}}/conductores/1/viajes
+Authorization: Bearer {{token}}
+
+### Actualizar conductor -> 200
+PUT {{baseUrl}}/conductores/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Juan Carlos",
+  "apellido": "Gómez",
+  "dni": "30123456",
+  "numero_licencia": "LR30123456",
+  "fecha_alta_licencia": "2021-03-15",
+  "fecha_vencimiento_licencia": "2028-03-15"
+}
+
+### Eliminar conductor -> 200 (o 400 si tiene viajes)
+DELETE {{baseUrl}}/conductores/2
+Authorization: Bearer {{token}}

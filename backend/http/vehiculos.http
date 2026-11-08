@@ -1,0 +1,119 @@
+@baseUrl = http://localhost:3000
+
+### Iniciar sesión (obtiene el token para el resto de las peticiones)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "xavier@example.com",
+  "password": "Secreta123"
+}
+
+###
+@token = {{login.response.body.token}}
+
+### Listar vehículos -> 200
+GET {{baseUrl}}/vehiculos
+Authorization: Bearer {{token}}
+
+### Buscar vehículos por texto -> 200
+GET {{baseUrl}}/vehiculos?buscar=Mercedes
+Authorization: Bearer {{token}}
+
+### Listar sin token -> 401
+GET {{baseUrl}}/vehiculos
+
+### Crear vehículo (patente Mercosur) -> 201
+POST {{baseUrl}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marca": "Mercedes-Benz",
+  "modelo": "Atego 1726",
+  "patente": "AE123CD",
+  "anio": 2022,
+  "capacidad_carga": 12000
+}
+
+### Crear vehículo (patente formato viejo) -> 201
+POST {{baseUrl}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marca": "Iveco",
+  "modelo": "Daily 70C",
+  "patente": "kjh 452",
+  "anio": 2014,
+  "capacidad_carga": 3500.5
+}
+
+### Crear vehículo con datos inválidos -> 400
+POST {{baseUrl}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marca": "",
+  "modelo": "Sin datos",
+  "patente": "12-ABC",
+  "anio": 1800,
+  "capacidad_carga": -5
+}
+
+### Crear vehículo con patente repetida -> 400
+POST {{baseUrl}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marca": "Scania",
+  "modelo": "R450",
+  "patente": "AE123CD",
+  "anio": 2020,
+  "capacidad_carga": 25000
+}
+
+### Obtener vehículo por id -> 200
+GET {{baseUrl}}/vehiculos/1
+Authorization: Bearer {{token}}
+
+### Obtener vehículo inexistente -> 404
+GET {{baseUrl}}/vehiculos/9999
+Authorization: Bearer {{token}}
+
+### Historial de viajes y total de km del vehículo -> 200
+GET {{baseUrl}}/vehiculos/1/viajes
+Authorization: Bearer {{token}}
+
+### Actualizar vehículo -> 200
+PUT {{baseUrl}}/vehiculos/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marca": "Mercedes-Benz",
+  "modelo": "Atego 1726 Plus",
+  "patente": "AE123CD",
+  "anio": 2022,
+  "capacidad_carga": 12500
+}
+
+### Actualizar vehículo inexistente -> 404
+PUT {{baseUrl}}/vehiculos/9999
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marca": "Ford",
+  "modelo": "Cargo",
+  "patente": "ZZZ999",
+  "anio": 2010,
+  "capacidad_carga": 8000
+}
+
+### Eliminar vehículo -> 200 (o 400 si tiene viajes)
+DELETE {{baseUrl}}/vehiculos/2
+Authorization: Bearer {{token}}
