@@ -5,6 +5,7 @@ import Login from "./Login.jsx";
 import Registro from "./Registro.jsx";
 import Vehiculos from "./Vehiculos.jsx";
 import Conductores from "./Conductores.jsx";
+import Viajes from "./Viajes.jsx";
 import { AuthPage } from "./Auth.jsx";
 
 function App() {
@@ -27,6 +28,14 @@ function App() {
           element={
             <AuthPage>
               <Conductores />
+            </AuthPage>
+          }
+        />
+        <Route
+          path="viajes"
+          element={
+            <AuthPage>
+              <Viajes />
             </AuthPage>
           }
         />
