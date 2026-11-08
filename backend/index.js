@@ -4,6 +4,7 @@ import cors from "cors";
 import { probarConexion } from "./db.js";
 import passport from "passport";
 import authRouter, { authConfig } from "./auth.js";
+import usuariosRouter from "./usuarios.js";
 
 const app = express();
 const port = process.env.PORT ?? 3000;
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/usuarios", usuariosRouter);
 
 // Ruta inexistente
 app.use((req, res) => {
