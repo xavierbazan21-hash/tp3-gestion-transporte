@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { probarConexion } from "./db.js";
+import authRouter from "./auth.js";
 
 const app = express();
 const port = process.env.PORT ?? 3000;
@@ -12,6 +13,8 @@ app.use(cors({ origin: process.env.FRONTEND_URL ?? "http://localhost:5173" }));
 app.get("/", (req, res) => {
   res.json({ success: true, mensaje: "API de gestión de vehículos, conductores y viajes" });
 });
+
+app.use("/auth", authRouter);
 
 // Ruta inexistente
 app.use((req, res) => {
