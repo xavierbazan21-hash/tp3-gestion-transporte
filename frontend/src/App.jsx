@@ -4,6 +4,7 @@ import Home from "./Home.jsx";
 import Login from "./Login.jsx";
 import Registro from "./Registro.jsx";
 import Vehiculos from "./Vehiculos.jsx";
+import Conductores from "./Conductores.jsx";
 import { AuthPage } from "./Auth.jsx";
 
 function App() {
@@ -18,6 +19,14 @@ function App() {
           element={
             <AuthPage>
               <Vehiculos />
+            </AuthPage>
+          }
+        />
+        <Route
+          path="conductores"
+          element={
+            <AuthPage>
+              <Conductores />
             </AuthPage>
           }
         />
